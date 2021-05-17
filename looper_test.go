@@ -25,7 +25,7 @@ func TestPingPongUntilContextDone(t *testing.T) {
 
 	err := looper.AddCaseHandler(reflect.TypeOf(sentPayload{}),
 		func(chosen int, _ reflect.Value, _ interface{}, _ bool) bool {
-			looper.Cases.Remove(chosen)
+			looper.Remove(chosen)
 			return true
 		})
 
@@ -46,14 +46,14 @@ func TestPingPongUntilContextDone(t *testing.T) {
 			if recv%2 == 0 {
 				t.FailNow()
 			}
-			looper.Cases.Send(pongChan, recv+1, sentPayload{})
+			looper.Send(pongChan, recv+1, sentPayload{})
 			return true
 		})
 
 	err = looper.RecvAndCaseHandler(pongChan, pongPayload{},
 		func(_ int, val reflect.Value, _ interface{}, _ bool) bool {
 			recv := val.Interface().(int)
-			looper.Cases.Send(pingChan, recv+1, sentPayload{})
+			looper.Send(pingChan, recv+1, sentPayload{})
 			return true
 		})
 
