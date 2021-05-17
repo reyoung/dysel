@@ -2,7 +2,7 @@ package dysel
 
 import (
 	"errors"
-	reflect "github.com/goccy/go-reflect"
+	"reflect"
 )
 
 type defaultCallbackType func(chosen int, recv reflect.Value, payload interface{}, recvOK bool) (continue_ bool)

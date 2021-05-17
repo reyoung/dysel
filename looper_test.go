@@ -2,11 +2,10 @@ package dysel
 
 import (
 	"context"
+	"reflect"
 	"sync"
 	"testing"
 	"time"
-
-	reflect "github.com/goccy/go-reflect"
 )
 
 func TestPingPongUntilContextDone(t *testing.T) {

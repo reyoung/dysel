@@ -1,6 +1,6 @@
 package dysel
 
-import reflect "github.com/goccy/go-reflect"
+import "reflect"
 
 // Cases maintain a list of select cases for dynamic selection.
 //
