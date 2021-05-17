@@ -9,7 +9,7 @@ type defaultCallbackType func(chosen int, recv reflect.Value, payload interface{
 
 type Looper struct {
 	Cases           *Cases
-	callbacks       map[reflect.Type]interface{}
+	callbacks       map[reflect.Type]defaultCallbackType
 	defaultCallback defaultCallbackType
 }
 
@@ -19,7 +19,7 @@ var (
 	ErrAlreadySet = errors.New("payload type callback already set")
 )
 
-func (l *Looper) RecvAndCaseHandler(ch, payload, callback interface{}) error {
+func (l *Looper) RecvAndCaseHandler(ch, payload interface{}, callback defaultCallbackType) error {
 	payloadType := reflect.TypeOf(payload)
 	err := l.AddCaseHandler(payloadType, callback)
 	if err != nil {
@@ -29,17 +29,9 @@ func (l *Looper) RecvAndCaseHandler(ch, payload, callback interface{}) error {
 	return nil
 }
 
-func (l *Looper) AddCaseHandler(payloadType reflect.Type, callback interface{}) error {
-	callbackType := reflect.TypeOf(callback)
-
-	if callbackType.Kind() != reflect.Func || callbackType.NumOut() != 1 || callbackType.Out(
-		0).Kind() != reflect.Bool || callbackType.NumIn() != 4 || callbackType.In(
-		0).Kind() != reflect.Int || callbackType.In(1) != reflect.TypeOf(reflect.Value{}) || callbackType.In(
-		2) != payloadType || callbackType.In(3).Kind() != reflect.Bool {
-		return ErrBadHandlerSignature
-	}
+func (l *Looper) AddCaseHandler(payloadType reflect.Type, callback defaultCallbackType) error {
 	if l.callbacks == nil {
-		l.callbacks = map[reflect.Type]interface{}{}
+		l.callbacks = map[reflect.Type]defaultCallbackType{}
 	}
 	_, ok := l.callbacks[payloadType]
 	if ok {

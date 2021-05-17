@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 	"time"
-	
+
 	reflect "github.com/goccy/go-reflect"
 )
 
@@ -25,7 +25,7 @@ func TestPingPongUntilContextDone(t *testing.T) {
 	})
 
 	err := looper.AddCaseHandler(reflect.TypeOf(sentPayload{}),
-		func(chosen int, _ reflect.Value, _ sentPayload, _ bool) bool {
+		func(chosen int, _ reflect.Value, _ interface{}, _ bool) bool {
 			looper.Cases.Remove(chosen)
 			return true
 		})
@@ -34,7 +34,7 @@ func TestPingPongUntilContextDone(t *testing.T) {
 		t.FailNow()
 	}
 
-	err = looper.RecvAndCaseHandler(ctx.Done(), ctxDonePayload{}, func(int, reflect.Value, ctxDonePayload, bool) bool {
+	err = looper.RecvAndCaseHandler(ctx.Done(), ctxDonePayload{}, func(int, reflect.Value, interface{}, bool) bool {
 		return false
 	})
 	if err != nil {
@@ -42,7 +42,7 @@ func TestPingPongUntilContextDone(t *testing.T) {
 	}
 
 	err = looper.RecvAndCaseHandler(pingChan, pingPayload{},
-		func(_ int, val reflect.Value, _ pingPayload, _ bool) bool {
+		func(_ int, val reflect.Value, _ interface{}, _ bool) bool {
 			recv := val.Interface().(int)
 			if recv%2 == 0 {
 				t.FailNow()
@@ -52,7 +52,7 @@ func TestPingPongUntilContextDone(t *testing.T) {
 		})
 
 	err = looper.RecvAndCaseHandler(pongChan, pongPayload{},
-		func(_ int, val reflect.Value, _ pongPayload, _ bool) bool {
+		func(_ int, val reflect.Value, _ interface{}, _ bool) bool {
 			recv := val.Interface().(int)
 			looper.Cases.Send(pingChan, recv+1, sentPayload{})
 			return true
